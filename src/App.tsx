@@ -16,6 +16,21 @@ const footerNavigation = [
 ]
 
 const routes: Route[] = ['/', '/services', '/contacts', '/legal', '/certificates', '/privacy']
+const BASE_PATH = import.meta.env.BASE_URL.replace(/\/$/, '')
+
+function toHref(path: Route) {
+  return path === '/' ? `${BASE_PATH}/` : `${BASE_PATH}${path}`
+}
+
+function getRoute(): Route {
+  const { pathname } = window.location
+  const stripped = BASE_PATH && pathname.startsWith(BASE_PATH)
+    ? pathname.slice(BASE_PATH.length)
+    : pathname
+  const path = stripped.startsWith('/') ? stripped : `/${stripped}`
+
+  return routes.includes(path as Route) ? (path as Route) : '/'
+}
 
 const services = [
   {
@@ -47,11 +62,6 @@ const services = [
     points: [],
   },
 ]
-
-function getRoute(): Route {
-  const path = window.location.pathname
-  return routes.includes(path as Route) ? (path as Route) : '/'
-}
 
 function NavCircuit() {
   return (
@@ -85,7 +95,7 @@ function NavLinks({
       {items.map((item) => (
         <a
           className={route === item.path ? 'nav-link nav-link-active' : 'nav-link'}
-          href={item.path}
+          href={toHref(item.path)}
           key={item.path}
           onClick={(event) => { event.preventDefault(); onNavigate(item.path) }}
         >
@@ -108,7 +118,7 @@ function App() {
   }, [])
 
   const navigate = (path: Route) => {
-    window.history.pushState({}, '', path)
+    window.history.pushState({}, '', toHref(path))
     setRoute(path)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
