@@ -1,5 +1,5 @@
 import { copyFileSync, existsSync, writeFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
@@ -10,13 +10,12 @@ export default defineConfig({
     {
       name: 'github-pages-404',
       closeBundle() {
-        const index = fileURLToPath(new URL('./dist/index.html', import.meta.url))
-        const fallback = fileURLToPath(new URL('./dist/404.html', import.meta.url))
-        const nojekyll = fileURLToPath(new URL('./dist/.nojekyll', import.meta.url))
+        const dist = join(process.cwd(), 'dist')
+        const index = join(dist, 'index.html')
         if (existsSync(index)) {
-          copyFileSync(index, fallback)
+          copyFileSync(index, join(dist, '404.html'))
         }
-        writeFileSync(nojekyll, '')
+        writeFileSync(join(dist, '.nojekyll'), '')
       },
     },
   ],
